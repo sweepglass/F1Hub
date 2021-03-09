@@ -56,7 +56,8 @@ and you will be greeted by the Menu
 
 ## Usage
 
-In early versions, the login proces will be a little tedious, as the API gives some trouble in the login process.
+Login by password is now available! It is stored in plaintext on your computer for now, though, so be careful!
+Otherwise:
 You will need to open [F1TV](f1tv.formula1.com) in your browser, right-click anywhere on the page, and select _"Inspect"_ from the menu.
 In the bar that opens, select the _"Network"_ tab. Check the box saying _"Preserve Log"_. In Firefox, this option will appear when you click on the gears and is named _"Persist Logs"_
 Now, log in, as with any other website. The tab should fill with a list of network requests. Once you are logged in, type _"ENTITLEMENT"_ into the search bar of the inspector tab. There should be one entry of that name. Right click on the entry and select _"Copy -> Copy Response"_. The information was copied to your clipboard
@@ -69,7 +70,6 @@ To play a stream using content ID, first navigate to the video [in your browser]
 This _may_ work for live sessions, if they are designed the same way. We will know when Preseason testing comes around.
 ## Known Bugs
  - 2020 Preaseason Testing doesn't include full sessions. This is because this is the only event that has a different API response structure. I plan on fixing this soon.
- - No Live detection. See above
  - The menu sometimes spazzes out in seasons before 2018. This is because of long titles resulting by a mishandling of the API - this is low priority because these sessions have only one stream. The main purpose of this program is to provide a multi-stream service. However, I do plan on fixing it at some point down the line.
  - Some menus only show partial content, none at all, or provide no stream. The API pre-2017 is wildly different. I didn't realize until too late and it will be patched at some point. 2020-2018 Work flawlessly, though
  - 2021 Sessions and Info not available. Current season is not implemented yet, as there is no info on the buildup. It will come at some point before the season.
@@ -80,7 +80,7 @@ This _may_ work for live sessions, if they are designed the same way. We will kn
 - Better, more flexible menu structure, and a graphical UI down the line.
 - Live feature before the season's start
 - 2021 Integration before the season's start
-- Any Event based on ID being able to be played, ideally before the season's start.
+- Any Event based on ID being able to be played, ideally before the season's start. _NOW AVAILABLE_
 
 ## Disclaimer
 This program is provided as is, with no warranty whatsoever. I do not take responsibility for any damages or issues that may result from direct or indirect use of this program. Just to cover my back.

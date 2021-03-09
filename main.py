@@ -17,10 +17,10 @@ import getUrlById
 
 # Main menu settings
 main_menu_title = "  F1Hub Main Menu\n"
-#if checkForLive.checkForLive().checkForLive():
-main_menu_items = ["Season Select", "Play by Content ID", "F1TV Login", "F1TV Logout", "Quit"]
-#else:
-#    main_menu_items = ["Season Select", "F1TV Login", "F1TV Logout", "LIVE", "Quit"]
+if checkForLive.checkForLive().checkForLive():
+    main_menu_items = ["Live Session", "Season Select", "Play by Content ID", "F1TV Login", "F1TV Logout", "Quit"]
+else:
+    main_menu_items = ["Season Select", "Play by Content ID", "F1TV Login", "F1TV Logout", "Quit"]
 main_menu_cursor = "> "
 main_menu_cursor_style = ("fg_red", "bold")
 main_menu_style = ("bg_red", "fg_yellow")
@@ -104,7 +104,7 @@ play_menu = TerminalMenu(play_menu_items,
                         cycle_cursor=True,
                         clear_screen=True)
 
-login_menu_items = ['Log In with password [BROKEN]', "Log in with Entitlement Token", "Return to Main Menu"]
+login_menu_items = ['Log In with password', "Log in with Entitlement Token", "Return to Main Menu"]
 login_menu_title =  "   Login Menu\n"
 login_menu = TerminalMenu(login_menu_items,
                         login_menu_title,
@@ -159,7 +159,14 @@ def main():
     while not main_menu_exit:
         main_sel = main_menu.show()
 
-        if main_sel == 0:
+        # IF LIVE SESSION IS ACTIVE, THE LENGTH OF THE MENU ITEMS IS DIFFERENT.
+        # To solve this, a shift value of 1 will be applied if the live value is present.
+        if main_menu_items[0] == "Live Session":
+            shift_val = 1
+        else:
+            shift_val = 0
+
+        if main_sel == 0+shift_val:
             while not season_menu_back:
                 season_sel = season_menu.show()
                 if season_sel == len(season_menu_items)-1:
@@ -245,18 +252,18 @@ def main():
                                                         if play_sel == len(play_menu_items)-1:
                                                             play_menu_back = True
                                                         else:
-                                                            #print("YAYYY")
-                                                            #time.sleep(3)
-                                                            # PLAY THE STREAM
-                                                            baseUrl = getFeedElements(selector_sel, tarUrl, sess_sel)[stream_sel].getUrl()
-                                                            streamUrl = getM3U8Stream.getTokenizedUrl(baseUrl, auth).getUrl()
-                                                            #print("end")
-                                                            #time.sleep(5)
-                                                            subprocess.call(["gnome-terminal", "-x", "mpv", "--border=no", streamUrl])
-                                                            #t.start()
-                                                            #print("Done")
-                                                            #time.sleep(5)
-
+                                                            try:
+                                                                baseUrl = getFeedElements(selector_sel, tarUrl, sess_sel)[stream_sel].getUrl()
+                                                                streamUrl = getM3U8Stream.getTokenizedUrl(baseUrl, auth).getUrl()
+                                                                
+                                                                try:
+                                                                    subprocess.call(["gnome-terminal", "-x", "mpv", "--border=no", streamUrl])
+                                                                except:
+                                                                    print("Failed to start new video session. Please open an issue on the GitHub repo as soon as possible, including your Operating System. Thanks!")
+                                                                    time.sleep(5)
+                                                            except:
+                                                                print("Failed to get playable link. Are you logged in?")
+                                                                time.sleep(5)
 
                                                     play_menu_back = False
                                             stream_menu_back = False
@@ -268,7 +275,7 @@ def main():
                     event_menu_back = False
 
             season_menu_back = False
-        elif main_sel == 1:
+        elif main_sel == 1+shift_val:
             print("Please enter the desired Content ID:")
             contentID = input()
             #time.sleep(3)
@@ -301,7 +308,11 @@ def main():
                             try:
                                 baseUrl = getIdSelectionUrl(idObj, id_sel)
                                 streamUrl = streamUrl = getM3U8Stream.getTokenizedUrl(baseUrl, auth).getUrl()
-                                subprocess.call(["gnome-terminal", "-x", "mpv", "--border=no", streamUrl])
+                            
+                                try:
+                                    subprocess.call(["gnome-terminal", "-x", "mpv", "--border=no", streamUrl])
+                                except:
+                                    print("Failed to start new video session. Please open an issue on the GitHub repo as soon as possible, including your Operating System. Thanks!")
                             except:
                                 print("Failed to get Playable Link... are you logged in?")
                                 time.sleep(5)
@@ -313,31 +324,42 @@ def main():
 
 
 
-        elif main_sel == 2:
+        elif main_sel == 2+shift_val:
             print("Login Selected")
             while not login_menu_back:
                 login_sel = login_menu.show()
                 if login_sel == len(login_menu_items)-1:
                     login_menu_back = True
                 elif login_sel == 0:
-                    print("Not supported in this version...")
-                    time.sleep(3)
+                    print("AS OF THIS VERSION, YOUR LOGIN CREDENTIALS WILL BE STORED IN PLAINTEXT ON YOUR COMPUTER. This is a potential security risk, if other people access your computer. Please be advised.")
+                    print("Please enter your email address:")
+                    email = input()
+                    print("Please enter your password:")
+                    passw = input()
+                    print("Logging you in....")
+                    try:
+                        auth = authenticate.authenticate(email, passw)
+                        auth.authenticate()
+                        print("Successfully logged in.")
+                        time.sleep(3)
+                    except:
+                        print("Something went wrong")
+                        time.sleep(3)
                 elif login_sel == 1:
                     try:
                         auth = authenticate.authenticate("","")
                         auth.authByEntitlementToken()
-                        #auth.authByEntitlementToken()
                     except:
                         print("Error reading entitlement File, is it empty?")
                         time.sleep(5)
                 
             login_menu_back = True
 
-        elif main_sel == 3:
+        elif main_sel == 3+shift_val:
             open('./entitlement.json', 'w+').close()
             print("Logged out successfully.")
             time.sleep(3)
-        elif main_sel == 4:
+        elif main_sel == len(main_menu_items)-1:
             main_menu_exit = True
             #print("Quit Selected")#
 
