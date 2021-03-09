@@ -13,11 +13,12 @@ import getM3U8Stream
 import subprocess
 import os
 import checkForLive
+import getUrlById
 
 # Main menu settings
 main_menu_title = "  F1Hub Main Menu\n"
 #if checkForLive.checkForLive().checkForLive():
-main_menu_items = ["Season Select", "F1TV Login", "F1TV Logout", "Quit"]
+main_menu_items = ["Season Select", "Play by Content ID", "F1TV Login", "F1TV Logout", "Quit"]
 #else:
 #    main_menu_items = ["Season Select", "F1TV Login", "F1TV Logout", "LIVE", "Quit"]
 main_menu_cursor = "> "
@@ -43,6 +44,18 @@ event_menu = TerminalMenu(event_menu_items,
                         cycle_cursor=True,
                         clear_screen=True)
 events = []
+
+# ID menu settings
+ID_menu_items = []
+ID_menu_title = ""
+ID_menu = TerminalMenu(ID_menu_items,
+                        ID_menu_title,
+                        main_menu_cursor,
+                        main_menu_cursor_style,
+                        main_menu_style,
+                        cycle_cursor=True,
+                        clear_screen=True)
+sessions = []
 
 # Session menu settings
 session_menu_items = []
@@ -110,9 +123,13 @@ def main():
     play_menu_back = False
     stream_menu_back = False
     login_menu_back = False
+    ID_menu_back = False
 
-    #auth = authenticate.authenticate("","")
-    #auth.authByEntitlementToken()
+    auth = authenticate.authenticate("","")
+    try:
+        auth.authByEntitlementToken()
+    except:
+        pass
 
     events = []
     sessions = []
@@ -235,7 +252,7 @@ def main():
                                                             streamUrl = getM3U8Stream.getTokenizedUrl(baseUrl, auth).getUrl()
                                                             #print("end")
                                                             #time.sleep(5)
-                                                            subprocess.call(["gnome-terminal", "-x", "mpv", "--border=no", "--really-quiet", streamUrl])
+                                                            subprocess.call(["gnome-terminal", "-x", "mpv", "--border=no", streamUrl])
                                                             #t.start()
                                                             #print("Done")
                                                             #time.sleep(5)
@@ -252,6 +269,51 @@ def main():
 
             season_menu_back = False
         elif main_sel == 1:
+            print("Please enter the desired Content ID:")
+            contentID = input()
+            #time.sleep(3)
+            try:
+                idObj = getUrlById.getUrlByContentId(contentID)
+            except:
+                print("Couldn't find ID. Please try again")
+                time.sleep(3)
+                exit
+            ID_menu_title = idObj.getObjName()
+            ID_menu_items = getIdItems(idObj)
+            ID_menu = TerminalMenu(ID_menu_items,
+                        ID_menu_title,
+                        main_menu_cursor,
+                        main_menu_cursor_style,
+                        main_menu_style,
+                        cycle_cursor=True,
+                        clear_screen=True)
+            while not ID_menu_back:
+                id_sel = ID_menu.show()
+                if id_sel == len(ID_menu_items)-1:
+                    ID_menu_back = True
+                else:
+                    while not play_menu_back:
+                        play_sel = play_menu.show()
+                        if play_sel == len(play_menu_items)-1:
+                            play_menu_back = True
+                        elif play_sel == 0:
+                            # Play with MPV
+                            try:
+                                baseUrl = getIdSelectionUrl(idObj, id_sel)
+                                streamUrl = streamUrl = getM3U8Stream.getTokenizedUrl(baseUrl, auth).getUrl()
+                                subprocess.call(["gnome-terminal", "-x", "mpv", "--border=no", streamUrl])
+                            except:
+                                print("Failed to get Playable Link... are you logged in?")
+                                time.sleep(5)
+                        elif play_sel == 1:
+                            # Copy to clipboard
+                            pass
+                    play_menu_back = False
+            ID_menu_back = False
+
+
+
+        elif main_sel == 2:
             print("Login Selected")
             while not login_menu_back:
                 login_sel = login_menu.show()
@@ -271,14 +333,24 @@ def main():
                 
             login_menu_back = True
 
-        elif main_sel == 2:
+        elif main_sel == 3:
             open('./entitlement.json', 'w+').close()
             print("Logged out successfully.")
             time.sleep(3)
-        elif main_sel == 3:
+        elif main_sel == 4:
             main_menu_exit = True
             #print("Quit Selected")#
-    
+
+
+def getIdItems(idObj):
+    nameList = []
+    for x in range(len(idObj.getAdditionalStreams())):
+        nameList.append(idObj.getAdditionalStreams()[x].getName())
+    nameList.append("Back to Main Menu")
+    return nameList
+
+def getIdSelectionUrl(idObj, sel):
+    return idObj.getAdditionalStreams()[sel].getUrl()
 
 def populateEventList(url):
     events = getEventUrl.getEvent(url).getAllEvents()

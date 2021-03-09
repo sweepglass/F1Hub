@@ -16,6 +16,7 @@ _*In theory. As of now, the F1TV website is needed for login_
 - Even if the website is down, usually the API stays available, which means F1Hub will be working as well.
 - Designed to work with the 2021 updated F1TV API, delivering you 1080p50 streams by default
 - Multi-Stream functionality: Unlike on the website, this tool opens as many streams as you like, enabling you to create your own Race Control at home
+- Simply enter a Content ID (long number in the URL of a play page) in the content ID menu and immediately play! No long menu browsing required.
 
 ## Anti-Features
 ##### _What this is not_
@@ -62,6 +63,10 @@ Now, log in, as with any other website. The tab should fill with a list of netwo
 In the folder containing F1Hub, open or create the file named _"entitlement.json"_ and paste your clipboard.
 
 After restarting F1Hub, you can use it fully. You may need to repeat that step occasionally. Usually, when F1Hub crashes and gives you an error, it will be due to entitlement issues.
+
+##### How to work with the ContentID
+To play a stream using content ID, first navigate to the video [in your browser](f1tv.formula1.com). You will see a long sequence of numbers in the URL, something like _"1000000716"_. That is the content ID. Copy that number and paste it into F1Hub in the _"Play by Content ID"_ menu. Proceed like normal.
+This _may_ work for live sessions, if they are designed the same way. We will know when Preseason testing comes around.
 ## Known Bugs
  - 2020 Preaseason Testing doesn't include full sessions. This is because this is the only event that has a different API response structure. I plan on fixing this soon.
  - No Live detection. See above

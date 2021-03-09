@@ -32,8 +32,8 @@ class authenticate:
         self.loggedIn = False
 
     def authByEntitlementToken(self):
-        x = open("./entitlement.json", 'w+')
-        x.close()
+        #x = open("./entitlement.json", 'w+')
+        #x.close()
         f = open("./entitlement.json", 'r+')
         tokResponse = f.read()
         tokjson = json.loads(tokResponse)
