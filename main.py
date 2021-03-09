@@ -111,8 +111,8 @@ def main():
     stream_menu_back = False
     login_menu_back = False
 
-    auth = authenticate.authenticate("","")
-    auth.authByEntitlementToken()
+    #auth = authenticate.authenticate("","")
+    #auth.authByEntitlementToken()
 
     events = []
     sessions = []
@@ -261,17 +261,20 @@ def main():
                     print("Not supported in this version...")
                     time.sleep(3)
                 elif login_sel == 1:
-                    #print("Paste your entitlement token... See Github Repo for Instructions")
-                    #token = input()
-                    auth.authByEntitlementToken()
+                    try:
+                        auth = authenticate.authenticate("","")
+                        auth.authByEntitlementToken()
+                        #auth.authByEntitlementToken()
+                    except:
+                        print("Error reading entitlement File, is it empty?")
+                        time.sleep(5)
                 
             login_menu_back = True
 
         elif main_sel == 2:
-            if os.path.exists("./entitlement.json"):
-                os.remove("./entitlement.json")
-            print("Logout Selected")
-            #time.sleep(5)
+            open('./entitlement.json', 'w+').close()
+            print("Logged out successfully.")
+            time.sleep(3)
         elif main_sel == 3:
             main_menu_exit = True
             #print("Quit Selected")#
